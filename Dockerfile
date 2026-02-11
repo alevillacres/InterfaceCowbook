@@ -1,4 +1,12 @@
-FROM ubuntu:latest
-LABEL authors="alessandro-villacres"
+FROM node:20-alpine
 
-ENTRYPOINT ["top", "-b"]
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev", "--", "--host"]
