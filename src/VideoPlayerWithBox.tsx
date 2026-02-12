@@ -38,7 +38,7 @@ export function VideoPlayerWithBox({ videoUrl, trackingData, cameraName }: Props
     const FPS = 6;
     const BOX_COLOR = '#062678';
 
-    // Mappa per accesso rapido ai frame (O(1))
+    // Mappa per accesso rapido ai frame
     const frameMap = useMemo(() =>
             new Map(trackingData.frames.map(f => [f.frame_id, f])),
         [trackingData]);
@@ -108,7 +108,7 @@ export function VideoPlayerWithBox({ videoUrl, trackingData, cameraName }: Props
             ctx.strokeRect(rx, ry, rw, rh);
 
             // Disegno etichetta Cow ID
-            const cowId = frameData.labels[index]?.id;
+            const cowId = frameData.labels[index].id;
             if (cowId !== undefined) {
                 const text = `Cow #${cowId}`;
                 const textWidth = ctx.measureText(text).width;
