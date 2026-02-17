@@ -1,41 +1,38 @@
 # Cowbook Web Interface
 
-La **Cowbook Web Interface** è il frontend del progetto Cowbook, progettato per fornire un'interfaccia utente intuitiva per la configurazione e la visualizzazione del tracciamento delle mucche all'interno di una stalla. L'applicazione permette di caricare video da diverse telecamere, configurarne la disposizione e visualizzare i risultati del tracciamento proiettati su una mappa 2D.
+The **Cowbook Web Interface** is the frontend component of the Cowbook project, designed to provide an intuitive user interface for configuring and visualizing cow tracking within a barn. The application allows users to upload video streams from multiple cameras, organize their layout, and view tracking results projected onto a 2D map.
 
-## Panoramica dell'Applicazione
+## Application Overview
 
-L'interfaccia è sviluppata con **React** e **TypeScript**, utilizzando **Vite** come build tool. Il design è focalizzato sulla semplicità d'uso per consentire anche a utenti non tecnici di gestire il sistema di monitoraggio.
+The interface is built with **React** and **TypeScript**, using **Vite** as the build tool. The design focuses on ease of use to ensure that even non-technical users can effectively manage the monitoring system.
 
-## Funzionalità Principali
+## Key Features
 
-### 1. Configurazione tramite Drag & Drop
-L'applicazione include un sistema di configurazione video basato su trascinamento (drag and drop):
-* **AreaDropzone**: Permette di caricare i file video semplicemente trascinandoli nelle aree corrispondenti alle telecamere.
-* **Mappatura Telecamere**: Supporta la configurazione di un gruppo di video (fino a 4) mappandoli agli ID telecamera reali (1, 4, 6, 8) richiesti dal server di inferenza.
+### 1. Drag & Drop Configuration
+The application features a video configuration system based on drag-and-drop functionality:
+* **AreaDropzone**: Allows users to upload video files by simply dragging them into areas corresponding to specific cameras.
+* **Camera Mapping**: Supports the configuration of a video group (up to 4) by mapping them to the actual camera IDs (1, 4, 6, 8) required by the inference server.
 
-### 2. Validazione dei Vincoli di Sicurezza
-L'interfaccia implementa controlli per garantire che la configurazione sia valida prima dell'invio al server:
-* Verifica che siano stati caricati i video necessari.
-* Gestione dei parametri di configurazione per assicurare la compatibilità con il modello di inferenza.
+### 2. Safety Constraint Validation
+The interface implements checks to ensure the configuration is valid before sending it to the server:
+* It verifies that the necessary videos for the group have been uploaded.
+* It manages configuration parameters to ensure compatibility with the inference model.
 
-### 3. Visualizzazione dei Risultati
-Una volta completata l'elaborazione, l'app offre diverse modalità di visualizzazione:
-* **Video Annotati**: Creazione di visualizzazioni che combinano il video originale con le annotazioni di tracciamento.
-* **Dati in Real-time**: Possibilità di visualizzare i dati elaborati frame per frame per un'analisi dettagliata.
+### 3. Results Visualization
+Once processing is complete, the app offers several visualization modes:
+* **Annotated Videos**: Creates visualizations that combine the original video with tracking annotations.
+* **Frame-by-Frame Data**: Allows users to view processed data frame-by-frame for detailed analysis.
 
-### 4. Interfaccia Live (WIP)
-È presente un modulo dedicato alla visualizzazione in live stream, predisposto per interfacciarsi con flussi video in tempo reale per un monitoraggio costante.
+## 🛠 Technologies Used
 
-## 🛠 Tecnologie Utilizzate
+* **React (Vite)**: The primary framework for building the user interface.
+* **TypeScript**: Used for type-safe data management between the frontend and the API.
+* **Tailwind CSS**: Utilized for rapid and responsive component styling.
+* **Axios**: Handles API communications with the Cowbook Inference Server.
 
-* **React (Vite)**: Framework principale per la costruzione dell'interfaccia.
-* **TypeScript**: Per una gestione sicura dei tipi di dato tra frontend e API.
-* **Tailwind CSS**: Utilizzato per lo styling rapido e reattivo dei componenti.
-* **Axios**: Per le comunicazioni API con il server di inferenza Cowbook.
+## Server Communication
 
-## 📡 Comunicazione con il Server
-
-L'interfaccia funge da client per il **Cowbook Inference Server**. Invia le richieste di elaborazione tramite endpoint POST multipart, trasmettendo i file video e gli indici di telecamera selezionati dall'utente, e riceve in risposta gli output del modello in formato JSON.
+The interface acts as a client for the **Cowbook Inference Server**. It sends processing requests via multipart POST endpoints, transmitting video files and user-selected camera indices, and receives model outputs in JSON format.
 
 ---
-*Nota: Per le istruzioni riguardanti la containerizzazione e l'avvio tramite Docker, consultare il file `README_DOCKER.md` (o equivalente).*
+*Note: For instructions regarding containerization and running the app via Docker, please refer to the `README_DOCKER.md` (or equivalent).*
