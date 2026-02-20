@@ -6,6 +6,8 @@ import {useNavigate} from "react-router-dom";
 export function VideoInterface(props: { isActive: boolean }) {
     const [videos, setVideos] = useState<(File | null)[]>([null, null, null, null]);
     const [loading, setLoading] = useState<boolean>(false);
+    const [trackingVideo, setTrackingVideo] = useState<boolean>(false);
+    const [projectionVideo, setProjectionVideo] = useState<boolean>(false);
     const navigate = useNavigate();
     if (props.isActive) {
         return null;
@@ -25,6 +27,9 @@ export function VideoInterface(props: { isActive: boolean }) {
         setLoading(true);
         const formData = new FormData();
         const videoUrls = videos.map(v => v ? URL.createObjectURL(v) : null);
+
+        formData.append('tracking_video', trackingVideo.toString())
+        formData.append('projection_video', projectionVideo.toString())
 
         videos.forEach((video, i) => {
             if(video !== null) {
@@ -77,7 +82,53 @@ export function VideoInterface(props: { isActive: boolean }) {
                 ))}
             </div>
 
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-8 mt-6 p-4 bg-slate-50 rounded-xl border border-slate-100">
 
+                <label className="flex items-center gap-3 cursor-pointer group">
+                    <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600 transition-colors">
+                        Track video
+                    </span>
+                    <div className="relative flex items-center">
+                        <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={trackingVideo}
+                            onChange={(e) => setTrackingVideo(e.target.checked)}
+                        />
+                        {/* Sfondo del toggle */}
+                        <div className="w-11 h-6 bg-slate-200 rounded-full peer
+                            peer-focus:ring-4 peer-focus:ring-indigo-100
+                            peer-checked:bg-indigo-600
+                            after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                            after:bg-white after:border-gray-300 after:border after:rounded-full
+                            after:h-5 after:w-5 after:transition-all
+                            peer-checked:after:translate-x-full peer-checked:after:border-white">
+                        </div>
+                    </div>
+                </label>
+
+                <label className="flex items-center gap-3 cursor-pointer group">
+                    <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600 transition-colors">
+                        Project video
+                    </span>
+                    <div className="relative flex items-center">
+                        <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={projectionVideo}
+                            onChange={(e) => setProjectionVideo(e.target.checked)}
+                        />
+                        <div className="w-11 h-6 bg-slate-200 rounded-full peer
+                            peer-focus:ring-4 peer-focus:ring-indigo-100
+                            peer-checked:bg-indigo-600
+                            after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                            after:bg-white after:border-gray-300 after:border after:rounded-full
+                            after:h-5 after:w-5 after:transition-all
+                            peer-checked:after:translate-x-full peer-checked:after:border-white">
+                        </div>
+                    </div>
+                </label>
+            </div>
             <div className="flex justify-center mt-4">
                 <button
                     onClick={handleAnalysisVideo}

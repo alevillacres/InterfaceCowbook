@@ -1,0 +1,32 @@
+services:
+  # Server di Inferenza
+  server:
+    build:
+      context: ./cowbook
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./cowbook/models:/app/models
+      - ./cowbook/output_json:/app/output_json
+      - ./cowbook/output_frames:/app/output_frames
+    # Se hai una GPU NVIDIA
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  # Interfaccia Web
+  client:
+    build:
+      context: ./InterfaceCowbook
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+    environment:
+      - VITE_API_URL=http://localhost:8000
