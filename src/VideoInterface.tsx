@@ -38,7 +38,13 @@ export function VideoInterface(props: { isActive: boolean }) {
             }
         })
         try{
-            const response = await axios.post('http://localhost:8000/', formData)
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+            const response = await axios.post(`${apiUrl}/`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Accept': 'application/json'
+                }
+            });
             console.log(`stato della risposta: ${response.data.status}`);
             console.log("numero Dati ricevuti dal server: ", response.data.results.length);
             navigate('/results-video', {
