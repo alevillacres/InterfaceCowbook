@@ -10,7 +10,7 @@ To allow Docker Compose to properly manage both projects simultaneously, they mu
 
 1. Create a new folder on your computer and name it `cowbook-project`.
 2. Move the two repository folders you downloaded or cloned inside it:
-   - `cowbook` (the backend/server project)
+   - `cowbook` (the backend/server project). Here you need to install and set `git lfs` to download models correctly.
    - `InterfaceCowbook` (the frontend/client project)
 3. Move (or create) the `docker-compose.yml` file directly inside the main `cowbook-project` folder, at the same level as the two project directories.
 
