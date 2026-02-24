@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { VideoPlayerWithBox } from "./VideoPlayerWithBox";
 
 // --- INTERFACCE ---
@@ -40,6 +40,8 @@ export function ResultsPage() {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const [copied, setCopied] = useState<boolean>(false);
+
     // 1. Estrazione dati "puri" dallo state
     const rawAnalysisResult = location.state?.analysisResult;
     const rawVideoSources = location.state?.videoSources;
@@ -66,6 +68,17 @@ export function ResultsPage() {
             });
     }, [rawAnalysisResult, rawVideoSources]);
 
+    const handleCopy = async () => {
+    const textToCopy = JSON.stringify(rawAnalysisResult, null, 2);
+    try {
+        await navigator.clipboard.writeText(textToCopy);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000); // Reset dopo 2 secondi
+    } catch (err) {
+        console.error("Errore nella copia:", err);
+    }
+};
+
     // 3. FIX: Controllo se ci sono dati usando rawAnalysisResult invece di resultsArray
     if (!rawAnalysisResult || (rawAnalysisResult as ResponseData[]).length === 0) {
         return (
@@ -83,7 +96,7 @@ export function ResultsPage() {
 
     return (
         <div className="p-5 bg-gray-50 min-h-screen animate-fade-in">
-            <h2 className="text-2xl font-bold mb-6 text-slate-800 tracking-tight">Analisi Video Completata</h2>
+            <h2 className="text-2xl font-bold mb-6 text-slate-800 tracking-tight flex justify-center">Analisi Video Completata</h2>
 
             {/* Griglia Video 2x2 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -117,10 +130,21 @@ export function ResultsPage() {
                     <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                     Raw Analysis Logs
                 </h3>
+
+                <div className="relative group">
+                    <button 
+                        onClick={handleCopy}
+                        className="absolute top-4 right-4 z-20 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 
+                           text-slate-300 text-[10px] font-mono rounded-md border border-slate-700 
+                           transition-all opacity-0 group-hover:opacity-100 focus:ring-1 focus:ring-green-500"
+                >
+                    {copied ? 'COPIATO' : 'COPIA'}
+                </button>
                 <div className="bg-slate-900 ring-1 ring-slate-800 text-green-400 p-6 rounded-xl shadow-2xl max-h-[500px] overflow-auto font-mono text-[11px] leading-relaxed">
                     <pre className="selection:bg-indigo-500 selection:text-white">
                         {JSON.stringify(rawAnalysisResult, null, 2)}
                     </pre>
+                </div>
                 </div>
             </div>
 
