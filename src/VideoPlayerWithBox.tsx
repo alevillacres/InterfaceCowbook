@@ -25,14 +25,18 @@ interface Props {
     videoUrl: string;
     trackingData: TrackingData;
     cameraName: string;
+    isPlaying: boolean;
+    currentTime: number;
+    isLeader?: boolean; 
+    onTimeUpdate?: (time: number) => void;
+    onMetadataLoaded?: (duration: number) => void;
 }
 
-export function VideoPlayerWithBox({ videoUrl, trackingData, cameraName }: Props) {
+export function VideoPlayerWithBox({ videoUrl, trackingData, cameraName, isPlaying, currentTime, isLeader, onTimeUpdate, onMetadataLoaded }: Props) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Stato per tracciare le dimensioni e la posizione esatta del video nel DOM
     const [layout, setLayout] = useState({ width: 0, height: 0, top: 0, left: 0 });
 
     const FPS = 6;
@@ -42,6 +46,25 @@ export function VideoPlayerWithBox({ videoUrl, trackingData, cameraName }: Props
     const frameMap = useMemo(() =>
             new Map(trackingData.frames.map(f => [f.frame_id, f])),
         [trackingData]);
+
+    // Sicronizzare Play/pause
+    useEffect(() => {
+        if(!videoRef.current) return
+        if (isPlaying) videoRef.current.play().catch(() => {});
+        else videoRef.current.pause();
+    }, [isPlaying]);
+
+    useEffect(() => {
+        if (!videoRef.current) return;
+        
+        // Se è un follower o se il video è in pausa (stiamo usando lo slider), sincronizza
+        // Usiamo una soglia di tolleranza per evitare loop infiniti
+        const diff = Math.abs(videoRef.current.currentTime - currentTime);
+        if (diff > 0.15) { 
+            videoRef.current.currentTime = currentTime;
+        }
+    }, [currentTime])
+
 
     const updateLayout = () => {
         if (videoRef.current && containerRef.current) {
@@ -83,7 +106,7 @@ export function VideoPlayerWithBox({ videoUrl, trackingData, cameraName }: Props
         ctx.clearRect(0, 0, layout.width, layout.height);
 
         // Calcolo del frame attuale in base al tempo del video
-        const currentFrameIdx = Math.floor(video.currentTime * FPS);
+        const currentFrameIdx = Math.floor(currentTime * FPS);
         const frameData = frameMap.get(currentFrameIdx);
 
         if (!frameData) return;
@@ -124,17 +147,8 @@ export function VideoPlayerWithBox({ videoUrl, trackingData, cameraName }: Props
 
     // Trigger del disegno sugli eventi del video
     useEffect(() => {
-        const video = videoRef.current;
-        if (!video) return;
-
-        video.addEventListener('timeupdate', drawBoxes);
-        video.addEventListener('seeked', drawBoxes);
-
-        return () => {
-            video.removeEventListener('timeupdate', drawBoxes);
-            video.removeEventListener('seeked', drawBoxes);
-        };
-    }, [layout, frameMap]);
+        drawBoxes();
+    }, [currentTime, layout, frameMap]);
 
     return (
         <div
@@ -151,14 +165,19 @@ export function VideoPlayerWithBox({ videoUrl, trackingData, cameraName }: Props
             <video
                 ref={videoRef}
                 src={videoUrl}
-                controls
                 muted
                 loop
                 playsInline
                 className="w-full h-auto block"
-                onLoadedMetadata={updateLayout}
-                onLoadedData={updateLayout}
-                onPlay={updateLayout}
+                onLoadedMetadata={(e) => {
+                    updateLayout();
+                    onMetadataLoaded?.(e.currentTarget.duration);
+                }}
+                onTimeUpdate={(e) => {
+                    if (isLeader && isPlaying) {
+                        onTimeUpdate?.(e.currentTarget.currentTime);
+                    }
+                }}
             />
 
             {/* Canvas sovrapposto con posizione dinamica basata sul layout del video */}

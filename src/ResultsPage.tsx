@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useMemo, useState } from "react";
+import {  useMemo, useState } from "react";
 import { VideoPlayerWithBox } from "./VideoPlayerWithBox";
 
 // --- INTERFACCE ---
@@ -69,17 +69,21 @@ export function ResultsPage() {
     }, [rawAnalysisResult, rawVideoSources]);
 
     const handleCopy = async () => {
-    const textToCopy = JSON.stringify(rawAnalysisResult, null, 2);
-    try {
-        await navigator.clipboard.writeText(textToCopy);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000); // Reset dopo 2 secondi
-    } catch (err) {
-        console.error("Errore nella copia:", err);
-    }
-};
+        const textToCopy = JSON.stringify(rawAnalysisResult, null, 2);
+        try {
+            await navigator.clipboard.writeText(textToCopy);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000); // Reset dopo 2 secondi
+        } catch (err) {
+            console.error("Errore nella copia:", err);
+        }
+    };
 
-    // 3. FIX: Controllo se ci sono dati usando rawAnalysisResult invece di resultsArray
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+   
+    // 3. Controllo se ci sono dati usando rawAnalysisResult invece di resultsArray
     if (!rawAnalysisResult || (rawAnalysisResult as ResponseData[]).length === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50">
@@ -94,19 +98,55 @@ export function ResultsPage() {
         );
     }
 
+
     return (
         <div className="p-5 bg-gray-50 min-h-screen animate-fade-in">
             <h2 className="text-2xl font-bold mb-6 text-slate-800 tracking-tight flex justify-center">Analisi Video Completata</h2>
 
+            {/* CONTROLLER CONDIVISO */}
+            <div className="max-w-4xl mx-auto mb-8 bg-white p-4 rounded-2xl shadow-lg border border-slate-200">
+                <div className="flex items-center gap-4">
+                    <button 
+                        onClick={() => setIsPlaying(!isPlaying)}
+                        className="p-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors"
+                    >
+                        {isPlaying ? (
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        ) : (
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        )}
+                    </button>
+                    
+                    <input 
+                        type="range" 
+                        min={0} 
+                        max={duration || 100} 
+                        step={0.1}
+                        value={currentTime}
+                        onChange={(e) => setCurrentTime(parseFloat(e.target.value))}
+                        className="flex-grow h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                    />
+                    
+                    <span className="text-xs font-mono text-slate-500 w-16">
+                        {currentTime.toFixed(1)}s / {duration.toFixed(1)}s
+                    </span>
+                </div>
+            </div>
+
             {/* Griglia Video 2x2 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                {camerasData.map((cam) => (
+                {camerasData.map((cam, index) => (
                     <div key={cam.cam_id} className="group shadow-sm hover:shadow-xl rounded-xl p-3 bg-white border border-slate-200 transition-all duration-300">
                         <div className="overflow-hidden rounded-lg bg-slate-100">
                             <VideoPlayerWithBox
                                 videoUrl={cam.videoUrl}
                                 trackingData={cam.data}
                                 cameraName={`Camera ${cam.cam_id}`}
+                                isPlaying={isPlaying}
+                                currentTime={currentTime}
+                                isLeader={index === 0}
+                                onTimeUpdate={(t) => setCurrentTime(t)} // Il leader aggiorna il tempo globale
+                                onMetadataLoaded={(d) => setDuration(Math.max(duration, d))}
                             />
                         </div>
                         <div className="p-3 text-sm flex justify-between items-center">
