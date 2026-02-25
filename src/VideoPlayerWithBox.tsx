@@ -89,8 +89,7 @@ export function VideoPlayerWithBox({ videoUrl, trackingData, cameraName }: Props
         if (!frameData) return;
 
         // Fattori di scala: dimensione visualizzata / dimensione nativa (pixel del server)
-        let scaleX = layout.width / video.videoWidth;
-        scaleX = scaleX * 0.56
+        const scaleX = layout.width / video.videoWidth;
         const scaleY = layout.height / video.videoHeight;
 
         ctx.strokeStyle = BOX_COLOR;
